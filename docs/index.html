@@ -10,8 +10,9 @@ html, body {
   padding: 0;
   height: 100%;
   overflow: hidden;
-  font-family: Arial, sans-serif;
-  background: #111; /* fallback background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f8ff, #e0f7ff);
+  color: #333;
 }
 
 #bgCanvas {
@@ -21,105 +22,84 @@ html, body {
   z-index: -1;
 }
 
-.container {
+.card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(0,0,0,0.5);
   z-index: 1;
+  background: rgba(255,255,255,0.95);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0,180,255,0.3);
+  width: 350px;
+  text-align: center;
+  margin: auto;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-h1 { font-size: 3em; margin-bottom: 10px; }
-p { font-size: 1.2em; margin-bottom: 40px; }
+h1 { margin-bottom: 25px; color: #0077cc; text-shadow: 0 0 10px rgba(0,119,204,0.5); }
 
-.button-group {
-  display: flex;
-  gap: 20px;
-}
-.btn {
-  text-decoration: none;
-  padding: 15px 30px;
-  font-size: 1em;
+.button-group { display: flex; justify-content: center; gap: 20px; }
+.button-group a {
+  padding: 12px 25px;
   border-radius: 8px;
-  color: white;
+  background: #00bfff;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
   transition: 0.3s;
 }
-.btn-login { background: #4CAF50; }
-.btn-login:hover { background: #45a049; }
-.btn-register { background: #2196F3; }
-.btn-register:hover { background: #0b7dda; }
+.button-group a:hover { background: #0077cc; }
 </style>
 </head>
 <body>
 
 <canvas id="bgCanvas"></canvas>
 
-<div class="container">
+<div class="card">
   <h1>Welcome to Certificate Generator</h1>
   <p>Create personalized certificates quickly and download them instantly.</p>
   <div class="button-group">
-    <a class="btn btn-login" href="login.html">Login</a>
-    <a class="btn btn-register" href="register.html">Register</a>
+    <a href="login.html">Login</a>
+    <a href="register.html">Register</a>
   </div>
 </div>
 
 <script>
-// Get canvas and context
 const canvas = document.getElementById('bgCanvas');
 const ctx = canvas.getContext('2d');
-
-// Resize function sets canvas internal width/height
-function resizeCanvas() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
+});
 
-// Create particles
 const particles = [];
-const particleCount = 100;
-
-for (let i = 0; i < particleCount; i++) {
+for(let i=0;i<60;i++){
   particles.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    radius: Math.random() * 4 + 2,
-    dx: (Math.random() - 0.5) * 1.5,
-    dy: (Math.random() - 0.5) * 1.5,
-    color: `rgba(0, 200, 255, 0.8)` // bright visible color
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    radius: Math.random()*2+1,
+    dx: (Math.random()-0.5)*0.5,
+    dy: (Math.random()-0.5)*0.5,
+    color: 'rgba(0,119,204,0.5)'
   });
 }
 
-// Animate particles
 function animate() {
-  // Fill background to create motion trail effect
-  ctx.fillStyle = 'rgba(17,17,17,0.4)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  particles.forEach(p => {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
     p.x += p.dx;
     p.y += p.dy;
-
-    // Bounce off edges
-    if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
-    if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-
-    // Draw circle
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
     ctx.fillStyle = p.color;
     ctx.fill();
   });
-
   requestAnimationFrame(animate);
 }
-
 animate();
 </script>
 
