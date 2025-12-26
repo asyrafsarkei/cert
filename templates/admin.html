@@ -1,0 +1,11 @@
+<h2>Pending Users</h2>
+{% for user in users %}
+  <form method="POST" style="margin-bottom:10px;">
+    {{ user.name }} ({{ user.email }})
+    <input type="hidden" name="approve_id" value="{{ user.id }}">
+    <button type="submit">Approve</button>
+  </form>
+{% else %}
+  <p>No pending users</p>
+{% endfor %}
+<a href="/logout">Logout</a>
