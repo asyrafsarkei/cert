@@ -80,6 +80,28 @@ def register():
         flash('Registration submitted. Wait for approval.')
         return redirect(url_for('login'))
     return render_template('register.html')
+    
+@app.route('/approve/<int:user_id>', methods=['POST'])
+@login_required
+def approve_user(user_id):
+    if current_user.email != 'rouge.qaz@gmail.com':
+        return "Access Denied", 403
+    user = User.query.get(user_id)
+    if user:
+        user.approved = True
+        db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/reject/<int:user_id>', methods=['POST'])
+@login_required
+def reject_user(user_id):
+    if current_user.email != 'rouge.qaz@gmail.com':
+        return "Access Denied", 403
+    user = User.query.get(user_id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+    return redirect(url_for('admin'))
 
 @app.route('/dashboard')
 @login_required
