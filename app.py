@@ -7,6 +7,15 @@ import os
 
 # Initialize app
 app = Flask(__name__)
+
+# Cookie settings for cross-domain login (GitHub Pages → Render)
+app.config.update(
+    SESSION_COOKIE_SAMESITE='None',
+    SESSION_COOKIE_SECURE=True
+)
+
+CORS(app, supports_credentials=True)
+
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # change this
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -117,6 +126,5 @@ def logout():
 
 # Run app
 gunicorn app:app
-CORS(app, supports_credentials=True)
 # if __name__ == '__main__':
 #    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
