@@ -11,8 +11,8 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #0b0c1a;
-  color: #fff;
+  background: linear-gradient(135deg, #f0f8ff, #e0f7ff);
+  color: #333;
 }
 
 #bgCanvas {
@@ -25,10 +25,10 @@ html, body {
 .register-card {
   position: relative;
   z-index: 1;
-  background: rgba(10,10,30,0.95);
+  background: rgba(255,255,255,0.95);
   padding: 40px;
   border-radius: 12px;
-  box-shadow: 0 0 30px rgba(0,255,255,0.3);
+  box-shadow: 0 0 30px rgba(0,180,255,0.3);
   width: 350px;
   text-align: center;
   margin: auto;
@@ -39,25 +39,25 @@ html, body {
 h2 {
   font-size: 2.5em;
   margin-bottom: 25px;
-  color: #00faff;
-  text-shadow: 0 0 15px #00faff;
+  color: #0077cc;
+  text-shadow: 0 0 10px rgba(0,119,204,0.5);
 }
 
 input[type="text"], input[type="email"], input[type="password"] {
   width: 100%;
   padding: 12px;
   margin-bottom: 15px;
-  border: 1px solid #00faff;
+  border: 1px solid #00bfff;
   border-radius: 8px;
   background: transparent;
-  color: #fff;
+  color: #333;
   font-size: 1em;
   outline: none;
   transition: 0.3s;
 }
 input:focus {
-  border-color: #0ff;
-  box-shadow: 0 0 10px #0ff;
+  border-color: #0077cc;
+  box-shadow: 0 0 10px #0077cc;
 }
 
 button {
@@ -65,25 +65,24 @@ button {
   padding: 12px;
   border: none;
   border-radius: 8px;
-  background: #0ff;
-  color: #000;
+  background: #00bfff;
+  color: #fff;
   font-size: 1em;
   cursor: pointer;
   transition: 0.3s;
 }
 button:hover {
-  background: #00faff;
-  color: #fff;
+  background: #0077cc;
 }
 
 p {
   margin-top: 20px;
   font-size: 0.9em;
-  color: #aaa;
+  color: #555;
 }
 
 a {
-  color: #0ff;
+  color: #0077cc;
   text-decoration: none;
 }
 a:hover {
@@ -107,7 +106,7 @@ a:hover {
 </div>
 
 <script>
-// Canvas background
+// Canvas background (light theme)
 const canvas = document.getElementById('bgCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -118,7 +117,7 @@ window.addEventListener('resize', () => {
   canvas.height = window.innerHeight;
 });
 
-// Particles
+// Light particles
 const particles = [];
 for(let i=0;i<60;i++){
   particles.push({
@@ -127,14 +126,13 @@ for(let i=0;i<60;i++){
     radius: Math.random()*2+1,
     dx: (Math.random()-0.5)*0.5,
     dy: (Math.random()-0.5)*0.5,
-    color: 'rgba(0,255,255,0.7)'
+    color: 'rgba(0,119,204,0.5)'
   });
 }
 
 // Animate
 function animate() {
-  ctx.fillStyle = 'rgba(11,12,26,0.3)';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
   particles.forEach(p=>{
     p.x += p.dx;
