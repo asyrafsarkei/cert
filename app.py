@@ -116,7 +116,22 @@ def reject_user(user_id):
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return f'Hello, {current_user.email}!'
+    if current_user.email != 'rouge.qaz@gmail.com':
+        return redirect(url_for('index'))
+
+    total_registered = User.query.count()
+    total_approved = User.query.filter_by(approved=True).count()
+    total_rejected = User.query.filter_by(approved=False).count()
+
+    users = User.query.all()
+
+    return render_template(
+        "admin.html",
+        total_registered=total_registered,
+        total_approved=total_approved,
+        total_rejected=total_rejected,
+        users=users
+    )
 
 @app.route('/logout')
 @login_required
