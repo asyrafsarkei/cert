@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import os
 
 # Initialize app
@@ -31,9 +32,11 @@ login_manager.login_view = 'login'
 # User model
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
     approved = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # registration date
+    approved_at = db.Column(db.DateTime, nullable=True)   
 
 # Create tables within app context
 with app.app_context():
@@ -90,8 +93,6 @@ def register():
         flash('Registration submitted. Wait for approval.')
         return redirect(url_for('login'))
     return render_template('register.html')
-    
-from datetime import datetime
 
 @app.route('/approve/<int:user_id>', methods=['POST'])
 @login_required
