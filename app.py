@@ -91,6 +91,8 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
     
+from datetime import datetime
+
 @app.route('/approve/<int:user_id>', methods=['POST'])
 @login_required
 def approve_user(user_id):
@@ -99,8 +101,9 @@ def approve_user(user_id):
     user = User.query.get(user_id)
     if user:
         user.approved = True
+        user.approved_at = datetime.utcnow()
         db.session.commit()
-    return redirect(url_for('admin'))
+    return redirect(url_for('dashboard'))
 
 @app.route('/reject/<int:user_id>', methods=['POST'])
 @login_required
@@ -109,9 +112,10 @@ def reject_user(user_id):
         return "Access Denied", 403
     user = User.query.get(user_id)
     if user:
-        db.session.delete(user)
+        user.approved = False
+        user.approved_at = datetime.utcnow()
         db.session.commit()
-    return redirect(url_for('admin'))
+    return redirect(url_for('dashboard'))
 
 @app.route('/dashboard')
 @login_required
