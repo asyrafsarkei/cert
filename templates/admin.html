@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f8ff, #e0f7ff);
+  color: #333;
+  overflow: hidden;
+}
+
+#bgCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 90%;
+  max-width: 900px;
+  margin: 50px auto;
+  background: rgba(255,255,255,0.95);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0,180,255,0.3);
+}
+
+h1 {
+  text-align: center;
+  color: #0077cc;
+  text-shadow: 0 0 10px rgba(0,119,204,0.5);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+
+tr:hover { background-color: rgba(0,119,204,0.1); }
+
+button {
+  padding: 8px 14px;
+  margin: 0 2px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.approve {
+  background-color: #00bfff;
+  color: #fff;
+}
+.approve:hover { background-color: #0077cc; }
+
+.reject {
+  background-color: #db4437;
+  color: #fff;
+}
+.reject:hover { background-color: #c1351d; }
+
+a.back {
+  display: inline-block;
+  margin-top: 20px;
+  color: #0077cc;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+a.back:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="container">
+  <h1>Admin Dashboard</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.name or 'N/A' }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          <form style="display:inline;" method="POST" action="{{ url_for('approve_user', user_id=user.id) }}">
+            <button type="submit" class="approve">Approve</button>
+          </form>
+          <form style="display:inline;" method="POST" action="{{ url_for('reject_user', user_id=user.id) }}">
+            <button type="submit" class="reject">Reject</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="/" class="back">← Back to Home</a>
+</div>
+
+<script>
+// Canvas particles
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const particles = [];
+for(let i=0;i<60;i++){
+  particles.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    radius: Math.random()*2+1,
+    dx: (Math.random()-0.5)*0.5,
+    dy: (Math.random()-0.5)*0.5,
+    color: 'rgba(0,119,204,0.5)'
+  });
+}
+
+function animate() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x += p.dx;
+    p.y += p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
