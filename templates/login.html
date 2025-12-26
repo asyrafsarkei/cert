@@ -84,18 +84,23 @@ a:hover { text-decoration: underline; }
 <canvas id="bgCanvas"></canvas>
 
 <div class="card">
-  <p style="text-align:left; margin-bottom: 15px;">
-    <a href="index.html" style="color:#0077cc; font-size:0.9em;">← Back to Home</a>
+  <p style="text-align:left; margin-bottom:15px;">
+    <a href="{{ url_for('index') }}" style="color:#0077cc; font-size:0.9em;">← Back to Home</a>
   </p>
+
   <h2>Login</h2>
-  <form id="loginForm" method="POST" action="{{ url_for('login') }}">
+
+  <form method="POST" action="{{ url_for('login') }}">
     <input type="email" name="email" placeholder="Email" required>
     <input type="password" name="password" placeholder="Password" required>
     <button type="submit">Login</button>
-    <button type="button" class="google-btn">Login with Google</button>
   </form>
-  <p>Don't have an account? <a href="register.html">Register here</a></p>
+
+  <p>Don't have an account?
+    <a href="{{ url_for('register') }}">Register here</a>
+  </p>
 </div>
+
 
 <script>
 const canvas = document.getElementById('bgCanvas');
