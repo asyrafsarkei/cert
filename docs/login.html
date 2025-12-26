@@ -10,8 +10,9 @@ html, body {
   padding: 0;
   height: 100%;
   overflow: hidden;
-  font-family: Arial, sans-serif;
-  background: #111; /* fallback */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f8ff, #e0f7ff);
+  color: #333;
 }
 
 #bgCanvas {
@@ -21,45 +22,51 @@ html, body {
   z-index: -1;
 }
 
-.login-card {
+.card {
   position: relative;
   z-index: 1;
   background: rgba(255,255,255,0.95);
   padding: 40px;
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  width: 320px;
+  box-shadow: 0 0 30px rgba(0,180,255,0.3);
+  width: 350px;
   text-align: center;
   margin: auto;
   top: 50%;
   transform: translateY(-50%);
 }
 
-h2 { margin-bottom: 25px; color: #333; }
+h2 { margin-bottom: 25px; color: #0077cc; text-shadow: 0 0 10px rgba(0,119,204,0.5); }
 
 input[type="email"], input[type="password"] {
   width: 100%;
   padding: 12px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
+  border: 1px solid #00bfff;
   border-radius: 8px;
+  background: transparent;
+  color: #333;
   font-size: 1em;
-  transition: border-color 0.3s;
+  outline: none;
+  transition: 0.3s;
 }
-input:focus { border-color: #2196F3; outline: none; }
+input:focus {
+  border-color: #0077cc;
+  box-shadow: 0 0 10px #0077cc;
+}
 
 button {
   width: 100%;
   padding: 12px;
   border: none;
   border-radius: 8px;
-  background: #2196F3;
-  color: white;
+  background: #00bfff;
+  color: #fff;
   font-size: 1em;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: 0.3s;
 }
-button:hover { background: #0b7dda; }
+button:hover { background: #0077cc; }
 
 .google-btn {
   margin-top: 15px;
@@ -68,7 +75,7 @@ button:hover { background: #0b7dda; }
 .google-btn:hover { background: #c1351d; }
 
 p { margin-top: 20px; font-size: 0.9em; color: #555; }
-a { color: #2196F3; text-decoration: none; }
+a { color: #0077cc; text-decoration: none; }
 a:hover { text-decoration: underline; }
 </style>
 </head>
@@ -76,7 +83,7 @@ a:hover { text-decoration: underline; }
 
 <canvas id="bgCanvas"></canvas>
 
-<div class="login-card">
+<div class="card">
   <h2>Login</h2>
   <form id="loginForm">
     <input type="email" name="email" placeholder="Email" required>
@@ -90,78 +97,42 @@ a:hover { text-decoration: underline; }
 <script>
 const canvas = document.getElementById('bgCanvas');
 const ctx = canvas.getContext('2d');
-
-// Set canvas size
-function resizeCanvas() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
+});
 
-// --- Sparks ---
-const sparks = [];
-for (let i=0; i<50; i++){
-  sparks.push({
+const particles = [];
+for(let i=0;i<60;i++){
+  particles.push({
     x: Math.random()*canvas.width,
     y: Math.random()*canvas.height,
     radius: Math.random()*2+1,
     dx: (Math.random()-0.5)*0.5,
     dy: (Math.random()-0.5)*0.5,
-    color: 'rgba(255,255,255,0.8)'
+    color: 'rgba(0,119,204,0.5)'
   });
 }
 
-// --- Planes ---
-const planes = [];
-for (let i=0; i<3; i++){
-  planes.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height/2,
-    size: 20,
-    speed: 1 + Math.random()*2
-  });
-}
-
-// --- Animate ---
 function animate() {
-  // Dark background with slight transparency to leave trails
-  ctx.fillStyle = 'rgba(17,17,17,0.3)';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // Sparks
-  sparks.forEach(s=>{
-    s.x += s.dx;
-    s.y += s.dy;
-    if(s.x<0||s.x>canvas.width)s.dx*=-1;
-    if(s.y<0||s.y>canvas.height)s.dy*=-1;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x += p.dx;
+    p.y += p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
     ctx.beginPath();
-    ctx.arc(s.x,s.y,s.radius,0,Math.PI*2);
-    ctx.fillStyle = s.color;
+    ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+    ctx.fillStyle = p.color;
     ctx.fill();
   });
-
-  // Planes (simple triangles)
-  planes.forEach(p=>{
-    p.x += p.speed;
-    if(p.x > canvas.width + p.size){
-      p.x = -p.size;
-      p.y = Math.random()*canvas.height/2;
-    }
-    ctx.fillStyle = 'rgba(255,200,50,0.9)';
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-    ctx.lineTo(p.x - p.size, p.y + p.size/2);
-    ctx.lineTo(p.x - p.size, p.y - p.size/2);
-    ctx.closePath();
-    ctx.fill();
-  });
-
   requestAnimationFrame(animate);
 }
 animate();
 
-// --- Form submit ---
+// Form submit
 const loginForm = document.getElementById('loginForm');
 loginForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
