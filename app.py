@@ -39,7 +39,7 @@ with app.app_context():
     admin_email = 'rouge.qaz@gmail.com'
     admin = User.query.filter_by(email=admin_email).first()
     if not admin:
-        admin = User(email=admin_email, password=generate_password_hash('admin', method='sha256'), approved=True)
+        admin = User(email=admin_email, password=generate_password_hash('admin', method='pbkdf2:sha256'), approved=True)
         db.session.add(admin)
         db.session.commit()
 
