@@ -1,8 +1,171 @@
-<form id="registerForm">
-  Name: <input name="name" required><br>
-  Email: <input name="email" type="email" required><br>
-  Password: <input name="password" type="password" required><br>
-  <button type="submit">Register</button>
-</form>
-<p id="message"></p>
-<script src="js/main.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register - Certificate Generator</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #0b0c1a;
+  color: #fff;
+}
+
+#bgCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.register-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(10,10,30,0.95);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0,255,255,0.3);
+  width: 350px;
+  text-align: center;
+  margin: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+h2 {
+  font-size: 2.5em;
+  margin-bottom: 25px;
+  color: #00faff;
+  text-shadow: 0 0 15px #00faff;
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #00faff;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font-size: 1em;
+  outline: none;
+  transition: 0.3s;
+}
+input:focus {
+  border-color: #0ff;
+  box-shadow: 0 0 10px #0ff;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #0ff;
+  color: #000;
+  font-size: 1em;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover {
+  background: #00faff;
+  color: #fff;
+}
+
+p {
+  margin-top: 20px;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+a {
+  color: #0ff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="register-card">
+  <h2>Create Account</h2>
+  <form id="registerForm">
+    <input type="text" name="name" placeholder="Full Name" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Register</button>
+  </form>
+  <p>Already have an account? <a href="login.html">Login here</a></p>
+</div>
+
+<script>
+// Canvas background
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+// Particles
+const particles = [];
+for(let i=0;i<60;i++){
+  particles.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    radius: Math.random()*2+1,
+    dx: (Math.random()-0.5)*0.5,
+    dy: (Math.random()-0.5)*0.5,
+    color: 'rgba(0,255,255,0.7)'
+  });
+}
+
+// Animate
+function animate() {
+  ctx.fillStyle = 'rgba(11,12,26,0.3)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  particles.forEach(p=>{
+    p.x += p.dx;
+    p.y += p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  });
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Form submit
+const registerForm = document.getElementById('registerForm');
+registerForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const formData = new FormData(registerForm);
+  const res = await fetch('https://yourapp.onrender.com/register', {
+    method: 'POST',
+    body: JSON.stringify(Object.fromEntries(formData)),
+    headers: {'Content-Type':'application/json'}
+  });
+  const data = await res.json();
+  alert(data.message);
+});
+</script>
+
+</body>
+</html>
