@@ -1,6 +1,154 @@
-<form method="POST">
-  Email: <input name="email" required><br>
-  Password: <input type="password" name="password" required><br>
-  <button type="submit">Login</button>
-</form>
-<p><a href="/register">Register</a></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Certificate Generator</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f8ff, #e0f7ff);
+  color: #333;
+}
+
+#bgCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255,255,255,0.95);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0,180,255,0.3);
+  width: 350px;
+  text-align: center;
+  margin: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+h2 { margin-bottom: 25px; color: #0077cc; text-shadow: 0 0 10px rgba(0,119,204,0.5); }
+
+input[type="email"], input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #00bfff;
+  border-radius: 8px;
+  background: transparent;
+  color: #333;
+  font-size: 1em;
+  outline: none;
+  transition: 0.3s;
+}
+input:focus {
+  border-color: #0077cc;
+  box-shadow: 0 0 10px #0077cc;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #00bfff;
+  color: #fff;
+  font-size: 1em;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover { background: #0077cc; }
+
+.google-btn {
+  margin-top: 15px;
+  background: #db4437;
+}
+.google-btn:hover { background: #c1351d; }
+
+p { margin-top: 20px; font-size: 0.9em; color: #555; }
+a { color: #0077cc; text-decoration: none; }
+a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="card">
+  <p style="text-align:left; margin-bottom: 15px;">
+    <a href="index.html" style="color:#0077cc; font-size:0.9em;">← Back to Home</a>
+  </p>
+  <h2>Login</h2>
+  <form id="loginForm">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+    <button type="button" class="google-btn">Login with Google</button>
+  </form>
+  <p>Don't have an account? <a href="register.html">Register here</a></p>
+</div>
+
+<script>
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const particles = [];
+for(let i=0;i<60;i++){
+  particles.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    radius: Math.random()*2+1,
+    dx: (Math.random()-0.5)*0.5,
+    dy: (Math.random()-0.5)*0.5,
+    color: 'rgba(0,119,204,0.5)'
+  });
+}
+
+function animate() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x += p.dx;
+    p.y += p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Form submit
+const loginForm = document.getElementById('loginForm');
+loginForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const formData = new FormData(loginForm);
+  const res = await fetch('https://yourapp.onrender.com/login', {
+    method: 'POST',
+    body: JSON.stringify(Object.fromEntries(formData)),
+    headers: {'Content-Type':'application/json'}
+  });
+  const data = await res.json();
+  alert(data.message);
+});
+</script>
+
+</body>
+</html>
