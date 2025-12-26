@@ -11,7 +11,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: Arial, sans-serif;
-  background: #111;
+  background: #111; /* fallback */
 }
 
 #bgCanvas {
@@ -90,84 +90,86 @@ a:hover { text-decoration: underline; }
 <script>
 const canvas = document.getElementById('bgCanvas');
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
 
-window.addEventListener('resize', () => {
+// Set canvas size
+function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-});
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
-// --- Particles / sparks ---
+// --- Sparks ---
 const sparks = [];
-for (let i = 0; i < 50; i++) {
+for (let i=0; i<50; i++){
   sparks.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    radius: Math.random() * 2 + 1,
-    dx: (Math.random() - 0.5) * 0.5,
-    dy: (Math.random() - 0.5) * 0.5,
-    color: `rgba(255,255,255,${Math.random()})`
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    radius: Math.random()*2+1,
+    dx: (Math.random()-0.5)*0.5,
+    dy: (Math.random()-0.5)*0.5,
+    color: 'rgba(255,255,255,0.8)'
   });
 }
 
-// --- Planes flying ---
+// --- Planes ---
 const planes = [];
-for (let i = 0; i < 3; i++) {
+for (let i=0; i<3; i++){
   planes.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height / 2,
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height/2,
     size: 20,
-    speed: 1 + Math.random() * 2
+    speed: 1 + Math.random()*2
   });
 }
 
+// --- Animate ---
 function animate() {
-  ctx.fillStyle = 'rgba(17,17,17,0.5)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Dark background with slight transparency to leave trails
+  ctx.fillStyle = 'rgba(17,17,17,0.3)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // Draw sparks
-  sparks.forEach(s => {
+  // Sparks
+  sparks.forEach(s=>{
     s.x += s.dx;
     s.y += s.dy;
-    if(s.x < 0 || s.x > canvas.width) s.dx *= -1;
-    if(s.y < 0 || s.y > canvas.height) s.dy *= -1;
+    if(s.x<0||s.x>canvas.width)s.dx*=-1;
+    if(s.y<0||s.y>canvas.height)s.dy*=-1;
     ctx.beginPath();
-    ctx.arc(s.x, s.y, s.radius, 0, Math.PI*2);
+    ctx.arc(s.x,s.y,s.radius,0,Math.PI*2);
     ctx.fillStyle = s.color;
     ctx.fill();
   });
 
-  // Draw planes (simple triangles)
-  planes.forEach(p => {
+  // Planes (simple triangles)
+  planes.forEach(p=>{
     p.x += p.speed;
-    if(p.x > canvas.width + p.size) {
+    if(p.x > canvas.width + p.size){
       p.x = -p.size;
-      p.y = Math.random() * canvas.height / 2;
+      p.y = Math.random()*canvas.height/2;
     }
     ctx.fillStyle = 'rgba(255,200,50,0.9)';
     ctx.beginPath();
     ctx.moveTo(p.x, p.y);
-    ctx.lineTo(p.x - p.size, p.y + p.size / 2);
-    ctx.lineTo(p.x - p.size, p.y - p.size / 2);
+    ctx.lineTo(p.x - p.size, p.y + p.size/2);
+    ctx.lineTo(p.x - p.size, p.y - p.size/2);
     ctx.closePath();
     ctx.fill();
   });
 
   requestAnimationFrame(animate);
 }
-
 animate();
 
-// --- Login form submit ---
+// --- Form submit ---
 const loginForm = document.getElementById('loginForm');
-loginForm.addEventListener('submit', async (e) => {
+loginForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   const formData = new FormData(loginForm);
   const res = await fetch('https://yourapp.onrender.com/login', {
     method: 'POST',
     body: JSON.stringify(Object.fromEntries(formData)),
-    headers: { 'Content-Type': 'application/json' }
+    headers: {'Content-Type':'application/json'}
   });
   const data = await res.json();
   alert(data.message);
