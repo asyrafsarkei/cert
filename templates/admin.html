@@ -108,13 +108,19 @@
 {% else %}
 <table>
   <tr>
+    <th>#</th>
     <th>Email</th>
+    <th>Date Registered</th>
+    <th>Date Approved/Rejected</th>
     <th>Status</th>
   </tr>
-  {% for u in users %}
+  {% for i, u in enumerate(users, start=1) %}
   <tr>
+    <td>{{ i }}</td>
     <td>{{ u.email }}</td>
-    <td>{{ "Approved" if u.approved else "Pending" }}</td>
+    <td>{{ u.created_at.strftime("%Y-%m-%d %H:%M") if u.created_at else "N/A" }}</td>
+    <td>{{ u.approved_at.strftime("%Y-%m-%d %H:%M") if u.approved_at else "N/A" }}</td>
+    <td>{{ "Approved" if u.approved else "Pending/Rejected" }}</td>
   </tr>
   {% endfor %}
 </table>
