@@ -2,3 +2,5 @@ Flask
 Flask-Login
 Flask-SQLAlchemy
 bcrypt
+gunicorn
+flask-cors
