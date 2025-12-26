@@ -96,7 +96,7 @@ a:hover {
 
 <div class="register-card">
   <p style="text-align:left; margin-bottom: 15px;">
-    <a href="index.html" style="color:#0077cc; font-size:0.9em;">← Back to Home</a>
+    <a href="{{ url_for('index') }}" style="color:#0077cc; font-size:0.9em;">← Back to Home</a>
   </p>
   <h2>Create Account</h2>
   <form id="registerForm">
@@ -105,7 +105,7 @@ a:hover {
     <input type="password" name="password" placeholder="Password" required>
     <button type="submit">Register</button>
   </form>
-  <p>Already have an account? <a href="login.html">Login here</a></p>
+  <p>Already have an account? <a href="{{ url_for('index') }}">Login here</a></p>
 </div>
 
 <script>
