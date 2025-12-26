@@ -1,61 +1,97 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
+# Initialize app
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
-
+app.config['SECRET_KEY'] = 'your_secret_key_here'  # change this
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
 db = SQLAlchemy(app)
 
-class User(db.Model):
+# Initialize login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# User model
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(120), unique=True)
-    password_hash = db.Column(db.String(200))
-    google_id = db.Column(db.String(200), unique=True, nullable=True)
-    is_approved = db.Column(db.Boolean, default=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    approved = db.Column(db.Boolean, default=False)
 
-db.create_all()
+# Create tables within app context
+with app.app_context():
+    db.create_all()
 
-ADMIN_EMAIL = "rouge.qaz@gmail.com"
-ADMIN_PASSWORD = "admin"
+# Load user
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
-@app.route('/register', methods=['POST'])
-def register():
-    data = request.get_json()
-    name = data.get('name')
-    email = data.get('email')
-    password = data.get('password')
-    if User.query.filter_by(email=email).first():
-        return jsonify({"success": False, "message": "Email already registered"})
-    hashed_pw = generate_password_hash(password)
-    user = User(name=name, email=email, password_hash=hashed_pw)
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({"success": True, "message": "Registration submitted. Waiting for approval."})
+# Default admin account (if not exists)
+with app.app_context():
+    admin_email = 'rouge.qaz@gmail.com'
+    admin = User.query.filter_by(email=admin_email).first()
+    if not admin:
+        admin = User(email=admin_email, password=generate_password_hash('admin', method='sha256'), approved=True)
+        db.session.add(admin)
+        db.session.commit()
 
-@app.route('/login', methods=['POST'])
+# Routes
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET','POST'])
 def login():
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            if not user.approved:
+                flash('Account not approved yet.')
+                return redirect(url_for('login'))
+            login_user(user)
+            return redirect(url_for('dashboard'))
+        flash('Invalid credentials.')
+        return redirect(url_for('login'))
+    return render_template('login.html')
 
-    # Admin login
-    if email == ADMIN_EMAIL and password == ADMIN_PASSWORD:
-        session['user'] = 'admin'
-        return jsonify({"success": True, "message": "Admin logged in"})
+@app.route('/register', methods=['GET','POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        name = request.form.get('name', '')
+        if User.query.filter_by(email=email).first():
+            flash('Email already registered.')
+            return redirect(url_for('register'))
+        hashed_pw = generate_password_hash(password, method='sha256')
+        new_user = User(email=email, password=hashed_pw, approved=False)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Registration submitted. Wait for approval.')
+        return redirect(url_for('login'))
+    return render_template('register.html')
 
-    user = User.query.filter_by(email=email).first()
-    if user:
-        if not user.is_approved:
-            return jsonify({"success": False, "message": "Pending approval"})
-        if check_password_hash(user.password_hash, password):
-            session['user'] = user.email
-            return jsonify({"success": True, "message": "Logged in successfully"})
-    return jsonify({"success": False, "message": "Invalid login"})
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return f'Hello, {current_user.email}!'
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+# Run app
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
